@@ -34,3 +34,34 @@ var ChinaGeo = [
 {"type": "Feature","properties":{"id":"81","size":"18000","name":"香港特别行政区","cp":[114.1178,22.3242],"childNum":1},"geometry":{"type":"Polygon","coordinates":[[[114.6094,22.4121],[114.5215,22.1484],[114.3457,22.1484],[113.9063,22.1484],[113.8184,22.1924],[113.9063,22.4121],[114.1699,22.5439],[114.3457,22.5439],[114.4336,22.5439],[114.4336,22.4121],[114.6094,22.4121]]]}},
 {"type": "Feature","properties":{"id":"82","size":"27","name":"澳门特别行政区","cp":[111.5547,22.1484],"childNum":1},"geometry":{"type":"Polygon","coordinates":[[[113.5986,22.1649],[113.6096,22.1265],[113.5547,22.11],[113.5437,22.2034],[113.5767,22.2034],[113.5986,22.1649]]]}}
 ]
+
+var map = L.map('mapid').setView([35.73, 109.59], 4);
+
+L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    maxZoom: 6,
+    id: 'phodal.pi7oknee',
+    accessToken: 'pk.eyJ1IjoicGhvZGFsIiwiYSI6ImNpbWcwaWpjcTAxdmh0aWx2MmJ0c2JnOTgifQ.043BP-oahpRBWKNW4A7Ybw'
+}).addTo(map);
+
+L.geoJson(ChinaGeo, {
+  onEachFeature: function(feature, layer) {
+    var label = L.marker(layer.getBounds().getCenter(), {
+      icon: L.divIcon({
+        className: 'label',
+        html: feature.properties.name
+      })
+    }).addTo(map);
+    layer.on('click', function (e) {
+      map.setView([feature.properties.cp[1], feature.properties.cp[0]], 6, {animation: true});
+      var provinceID = feature.properties.id;
+      var geojsonLayer = L.geoJson.ajax("/static/data/province/" + provinceID + ".json");
+      geojsonLayer.addTo(map);
+    });
+  },
+    style: {
+        "color": "#ff7800",
+        "weight": 2,
+        "opacity": 0.2
+    }
+}).addTo(map);
