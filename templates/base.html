@@ -40,6 +40,10 @@ L.geoJson(ChinaGeo, {
         html: feature.properties.name
       })
     }).addTo(map);
+    layer.on('click', function (e) {
+      console.log(e);
+      console.log(feature.properties.name)
+    });
   },
     style: {
         "color": "#ff7800",
