@@ -67,9 +67,9 @@ var NationGeoLayer = L.geoJson(ChinaGeo, {
 NationGeoLayer.addTo(map);
 
 var ProvinceView = function (feature, oldLayer) {
-    map.removeLayer(oldLayer);
+    // map.removeLayer(oldLayer);
     var provinceID = feature.properties.id;
-    $.getJSON("/static/data/province/" + provinceID + ".json", function(data){
+    $.getJSON("/static/data/province/" + provinceID + ".json", function (data) {
         var ProvinceLayer = L.geoJson(data, {
             onEachFeature: function (feature, layer) {
                 var label = L.marker(layer.getBounds().getCenter(), {
@@ -79,8 +79,11 @@ var ProvinceView = function (feature, oldLayer) {
                     })
                 }).addTo(map);
                 layer.on('click', function (e) {
-                    map.setView([feature.properties.cp[1], feature.properties.cp[0]], 7, {animation: true});
-                    CityView(feature, ProvinceLayer)
+                    var HK = '81', Macao = '82';
+                    if (!(HK & Macao)) {
+                        map.setView([feature.properties.cp[1], feature.properties.cp[0]], 7, {animation: true});
+                        CityView(feature, ProvinceLayer)
+                    }
                 });
             }
         });
@@ -90,10 +93,13 @@ var ProvinceView = function (feature, oldLayer) {
 
 
 var CityView = function (feature, oldLayer) {
-    map.removeLayer(oldLayer);
+    // map.removeLayer(oldLayer);
     var cityID = feature.properties.id;
-    console.log(feature.properties.id.substring(0, 2));
-    $.getJSON("/static/data/city/" + cityID + "00.json", function(data){
+    if (cityID.length <= 4) {
+        cityID = cityID + "00"
+    }
+    console.log(cityID);
+    $.getJSON("/static/data/city/" + cityID + ".json", function (data) {
         var CityLayer = L.geoJson(data, {
             onEachFeature: function (feature, layer) {
                 var label = L.marker(layer.getBounds().getCenter(), {
