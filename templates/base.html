@@ -20,13 +20,22 @@
 <script src="{% static 'js/jquery-2.2.2.min.js' %}"></script>
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
 <script src="{% static 'leaflet/leaflet.js' %}"></script>
+<script src="{% static 'js/app.js' %}"></script>
 <script>
-var mymap = L.map('mapid').setView([51.505, -0.09], 13);
+var map = L.map('mapid').setView([35.73, 109.59], 4);
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    maxZoom: 18,
+    maxZoom: 6,
     id: '{{ MAPBOX_ID }}',
     accessToken: '{{ MAPBOX_TOKEN }}'
-}).addTo(mymap);
+}).addTo(map);
+
+L.geoJson(ChinaGeo, {
+    style: {
+        "color": "#ff7800",
+        "weight": 2,
+        "opacity": 0.5
+    }
+}).addTo(map);
 </script>
 </html>
