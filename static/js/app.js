@@ -44,6 +44,59 @@ var map = L.map('mapid').setView([35.73, 109.59], 4);
 //     accessToken: 'pk.eyJ1IjoicGhvZGFsIiwiYSI6ImNpbWcwaWpjcTAxdmh0aWx2MmJ0c2JnOTgifQ.043BP-oahpRBWKNW4A7Ybw'
 // }).addTo(map);
 
+var editableLayers = new L.FeatureGroup();
+map.addLayer(editableLayers);
+
+var options = {
+    position: 'topright',
+    draw: {
+        polyline: {
+            shapeOptions: {
+                color: '#f357a1',
+                weight: 10
+            }
+        },
+        polygon: {
+            allowIntersection: false, // Restricts shapes to simple polygons
+            drawError: {
+                color: '#fff', // Color the shape will turn when intersects
+                message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
+            },
+            shapeOptions: {
+                color: '#bada55'
+            }
+        },
+        circle: false, // Turns off this drawing tool
+        rectangle: {
+            shapeOptions: {
+                clickable: false
+            }
+        }
+    },
+    edit: {
+        featureGroup: editableLayers, //REQUIRED!!
+        remove: false
+    }
+};
+
+var drawControl = new L.Control.Draw(options);
+map.addControl(drawControl);
+
+// Initialise the FeatureGroup to store editable layers
+var drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
+
+
+map.on('draw:created', function (e) {
+    var type = e.layerType,
+        layer = e.layer;
+
+    if (type === 'marker') {
+        layer.bindPopup('A popup!');
+    }
+
+    drawnItems.addLayer(layer);
+});
 
 var isNationCity = function(locationID) {
     var HK = '81', Macao = '82', Beijing = '11', Tianjin = '12', Shanghai = '31';
