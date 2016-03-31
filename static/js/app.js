@@ -47,7 +47,7 @@ var map = L.map('mapid').setView([35.73, 109.59], 4);
 
 var isNationCity = function(locationID) {
     var HK = '81', Macao = '82', Beijing = '11', Tianjin = '12', Shanghai = '31';
-    return $.inArray(locationID, [HK, Macao, Beijing, Tianjin, Shanghai]);
+    return $.inArray(locationID, [HK, Macao, Beijing, Tianjin, Shanghai]) !== -1;
 };
 
 var NationGeoLayer = L.geoJson(ChinaGeo, {
@@ -62,6 +62,10 @@ var NationGeoLayer = L.geoJson(ChinaGeo, {
             var scaleLevel = 6;
             if(isNationCity(feature.properties.id)) {
                 scaleLevel = 8;
+            }
+            var currentZoom = map.getZoom();
+            if(currentZoom > 8) {
+                scaleLevel = currentZoom;
             }
 
             map.setView([feature.properties.cp[1], feature.properties.cp[0]], scaleLevel, {animation: true});
@@ -90,9 +94,15 @@ var ProvinceView = function (feature, oldLayer) {
                     })
                 }).addTo(map);
                 layer.on('click', function (e) {
+                    var scaleLevel = 7;
+                    var currentZoom = map.getZoom();
+                    if(currentZoom > 8) {
+                        scaleLevel = currentZoom;
+                    }
+
                     var properties = feature.properties;
                     if (!isNationCity(properties.id.substring(0, 2))) {
-                        map.setView([properties.cp[1], properties.cp[0]], 7, {animation: true});
+                        map.setView([properties.cp[1], properties.cp[0]], scaleLevel, {animation: true});
                         CityView(feature, ProvinceLayer)
                     }
                 });
