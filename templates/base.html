@@ -20,6 +20,7 @@
 <script src="{% static 'js/jquery-2.2.2.min.js' %}"></script>
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
 <script src="{% static 'leaflet/leaflet.js' %}"></script>
+<script src="{% static 'leaflet/plugins/leaflet.ajax.min.js' %}"></script>
 <script src="{% static 'js/app.js' %}"></script>
 <script>
 var map = L.map('mapid').setView([35.73, 109.59], 4);
@@ -42,7 +43,9 @@ L.geoJson(ChinaGeo, {
     }).addTo(map);
     layer.on('click', function (e) {
       console.log(e);
-      console.log(feature.properties.name)
+      console.log(feature.properties.id)
+      var provinceID = feature.properties.id;
+      var geojsonLayer = L.geoJson.ajax("/static/data/province/" + provinceID + ".json");
     });
   },
     style: {
