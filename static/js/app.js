@@ -44,6 +44,12 @@ var map = L.map('mapid').setView([35.73, 109.59], 4);
 //     accessToken: 'pk.eyJ1IjoicGhvZGFsIiwiYSI6ImNpbWcwaWpjcTAxdmh0aWx2MmJ0c2JnOTgifQ.043BP-oahpRBWKNW4A7Ybw'
 // }).addTo(map);
 
+
+var isNationCity = function(locationID) {
+    var HK = '81', Macao = '82', Beijing = '11', Tianjin = '12', Shanghai = '31';
+    return $.inArray(locationID, [HK, Macao, Beijing, Tianjin, Shanghai]);
+};
+
 var NationGeoLayer = L.geoJson(ChinaGeo, {
     onEachFeature: function (feature, layer) {
         var label = L.marker(layer.getBounds().getCenter(), {
@@ -53,7 +59,12 @@ var NationGeoLayer = L.geoJson(ChinaGeo, {
             })
         }).addTo(map);
         layer.on('click', function (e) {
-            map.setView([feature.properties.cp[1], feature.properties.cp[0]], 6, {animation: true});
+            var scaleLevel = 6;
+            if(isNationCity(feature.properties.id)) {
+                scaleLevel = 8;
+            }
+
+            map.setView([feature.properties.cp[1], feature.properties.cp[0]], scaleLevel, {animation: true});
             ProvinceView(feature, NationGeoLayer)
         });
     },
@@ -79,9 +90,9 @@ var ProvinceView = function (feature, oldLayer) {
                     })
                 }).addTo(map);
                 layer.on('click', function (e) {
-                    var HK = '81', Macao = '82';
-                    if (!(HK & Macao)) {
-                        map.setView([feature.properties.cp[1], feature.properties.cp[0]], 7, {animation: true});
+                    var properties = feature.properties;
+                    if (!isNationCity(properties.id.substring(0, 2))) {
+                        map.setView([properties.cp[1], properties.cp[0]], 7, {animation: true});
                         CityView(feature, ProvinceLayer)
                     }
                 });
@@ -91,14 +102,13 @@ var ProvinceView = function (feature, oldLayer) {
     });
 };
 
-
 var CityView = function (feature, oldLayer) {
     // map.removeLayer(oldLayer);
     var cityID = feature.properties.id;
     if (cityID.length <= 4) {
         cityID = cityID + "00"
     }
-    console.log(cityID);
+
     $.getJSON("/static/data/city/" + cityID + ".json", function (data) {
         var CityLayer = L.geoJson(data, {
             onEachFeature: function (feature, layer) {
