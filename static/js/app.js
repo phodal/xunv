@@ -44,24 +44,31 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
     accessToken: 'pk.eyJ1IjoicGhvZGFsIiwiYSI6ImNpbWcwaWpjcTAxdmh0aWx2MmJ0c2JnOTgifQ.043BP-oahpRBWKNW4A7Ybw'
 }).addTo(map);
 
-L.geoJson(ChinaGeo, {
-  onEachFeature: function(feature, layer) {
-    var label = L.marker(layer.getBounds().getCenter(), {
-      icon: L.divIcon({
-        className: 'label',
-        html: feature.properties.name
-      })
-    }).addTo(map);
-    layer.on('click', function (e) {
-      map.setView([feature.properties.cp[1], feature.properties.cp[0]], 6, {animation: true});
-      var provinceID = feature.properties.id;
-      var geojsonLayer = L.geoJson.ajax("/static/data/province/" + provinceID + ".json");
-      geojsonLayer.addTo(map);
-    });
-  },
+var ChinaGeoLayer = L.geoJson(ChinaGeo, {
+    onEachFeature: function (feature, layer) {
+        var label = L.marker(layer.getBounds().getCenter(), {
+            icon: L.divIcon({
+                className: 'label',
+                html: feature.properties.name
+            })
+        }).addTo(map);
+        layer.on('click', function (e) {
+            map.setView([feature.properties.cp[1], feature.properties.cp[0]], 5, {animation: true});
+            ProvinceView(feature)
+        });
+    },
     style: {
         "color": "#ff7800",
         "weight": 2,
         "opacity": 0.2
     }
-}).addTo(map);
+});
+
+ChinaGeoLayer.addTo(map);
+
+var ProvinceView = function (feature) {
+    map.removeLayer(ChinaGeoLayer);
+    var provinceID = feature.properties.id;
+    var geojsonLayer = L.geoJson.ajax("/static/data/province/" + provinceID + ".json");
+    geojsonLayer.addTo(map);
+};
