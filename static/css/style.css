@@ -2,10 +2,13 @@ body {
   padding-top: 50px;
 }
 .starter-template {
-  padding: 40px 15px;
+  padding: 10px 2px;
   text-align: center;
 }
 
+#mapid {
+    height: 50%;
+}
 /*!
  * IE10 viewport hack for Surface/desktop Windows 8 bug
  * Copyright 2014-2015 Twitter, Inc.
